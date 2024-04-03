@@ -1,0 +1,14 @@
+
+// update Account when Opportunity  StageName == 'Closed Lost' by leltest Opportunity
+list<Account> Acc = [select name , oppCloseLost__c ,(Select name , StageName  ,AccountId ,closedate from Opportunities  ORDER BY  closedate DESC limit 1 ) from Account];
+for(Account AccRec : Acc){
+  for(Opportunity opp : AccRec.Opportunities){
+        if(opp.StageName == 'Closed Lost' && opp.AccountId != NULL){
+          AccRec.oppCloseLost__c = true ; 
+        }
+      else{
+           AccRec.oppCloseLost__c = false ;
+      }
+    }
+}
+update Acc;
