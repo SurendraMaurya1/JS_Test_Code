@@ -1,0 +1,33 @@
+// For 
+public class accountChackBoxTrue {
+    public static boolean forUpdate=false;
+    public static void chechContactPin (list<Account>newAccList  , map <id , account> oldMap){
+        set<id> accId = new set<id>();
+        List<Contact> lstOFContactToUpdate = new List<Contact>();
+        for(account acc :newAccList){
+            if( !string.isEmpty(acc.Postal_Code__c) && acc.Postal_Code__c != oldMap.get(acc.Id).Postal_Code__c){
+                accId.add(acc.Id);
+            }
+        }
+        list<Account> accList = [SELECT name ,Postal_Code__c, Not_Match__c , (select name ,Postal_Code__c, Not_Match__c from contacts )  FROM Account where id In : accId ];
+        for(Account accRec :accList){
+            list<Contact> conForUpdateList = new list<Contact> ();
+            if(accRec.contacts.size() >2){
+                for(contact con :accRec.contacts){ 
+                    if(accRec.Postal_Code__c != con.Postal_Code__c  &&conForUpdateList.size()<=2){
+                        con.Not_Match__c = true ;
+                        conForUpdateList.add(con);
+                    }
+                    if(conForUpdateList.size()==2){
+                        lstOFContactToUpdate.addall(conForUpdateList);
+                        accRec.Not_Match__c=true;
+                        break;
+                      }  
+                }
+            }
+        }
+        forUpdate=true;
+        update accList;  
+        update lstOFContactToUpdate;
+    }
+ }
